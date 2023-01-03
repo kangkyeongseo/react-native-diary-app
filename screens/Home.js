@@ -3,7 +3,7 @@ import styled from "styled-components/native";
 import colors from "../colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useDB } from "../context";
-import { FlatList, TouchableOpacity } from "react-native";
+import { FlatList, LayoutAnimation, TouchableOpacity } from "react-native";
 
 const View = styled.View`
   flex: 1;
@@ -58,6 +58,8 @@ const Home = ({ navigation: { navigate } }) => {
   useEffect(() => {
     const data = realm.objects("Feeling");
     data.addListener((data, changes) => {
+      LayoutAnimation.spring();
+      // LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
       setFeelings(data.sorted("_id", true));
     });
     return () => {
