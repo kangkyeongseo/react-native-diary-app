@@ -1,8 +1,10 @@
 import Realm from "realm";
-import AppLoading from "expo-app-loading";
 import { NavigationContainer } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navigator from "./navigator";
+import { ActivityIndicator } from "react-native";
+import styled from "styled-components";
+import colors from "./colors";
 
 const FeelingSchema = {
   name: "Fealing",
@@ -14,25 +16,30 @@ const FeelingSchema = {
   primaryKey: "_id",
 };
 
+const Loader = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${colors.bgColor};
+`;
+
 export default function App() {
-  const [ready, setReady] = useState(false);
-  const startLoading = async () => {
+  const [loading, setLoading] = useState(true);
+  const realmLoading = async () => {
     const realm = await Realm.open({
       path: "diaryDB",
       schema: [FeelingSchema],
     });
+    setLoading(false);
   };
-  const onFinish = () => setReady(true);
-  if (!ready) {
-    return (
-      <AppLoading
-        startAsync={startLoading}
-        onFinish={onFinish}
-        onError={console.error}
-      />
-    );
-  }
-  return (
+  useEffect(() => {
+    realmLoading();
+  }, []);
+  return loading ? (
+    <Loader>
+      <ActivityIndicator color="black" size="large" />
+    </Loader>
+  ) : (
     <NavigationContainer>
       <Navigator />
     </NavigationContainer>
