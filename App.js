@@ -5,9 +5,10 @@ import Navigator from "./navigator";
 import { ActivityIndicator } from "react-native";
 import styled from "styled-components";
 import colors from "./colors";
+import { DBContext } from "./context";
 
 const FeelingSchema = {
-  name: "Fealing",
+  name: "Feeling",
   properties: {
     _id: "int",
     emotion: "string",
@@ -25,11 +26,13 @@ const Loader = styled.View`
 
 export default function App() {
   const [loading, setLoading] = useState(true);
+  const [realm, setRealm] = useState(null);
   const realmLoading = async () => {
-    const realm = await Realm.open({
+    const connection = await Realm.open({
       path: "diaryDB",
       schema: [FeelingSchema],
     });
+    setRealm(connection);
     setLoading(false);
   };
   useEffect(() => {
@@ -40,8 +43,10 @@ export default function App() {
       <ActivityIndicator color="black" size="large" />
     </Loader>
   ) : (
-    <NavigationContainer>
-      <Navigator />
-    </NavigationContainer>
+    <DBContext.Provider value={realm}>
+      <NavigationContainer>
+        <Navigator />
+      </NavigationContainer>
+    </DBContext.Provider>
   );
 }
