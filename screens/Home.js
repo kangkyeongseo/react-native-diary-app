@@ -4,17 +4,20 @@ import colors from "../colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useDB } from "../context";
 import { FlatList, LayoutAnimation, TouchableOpacity } from "react-native";
+import { AdMobBanner } from "expo-ads-admob";
 
 const View = styled.View`
   flex: 1;
+  justify-content: center;
+  align-items: center;
   padding: 0px 50px;
   padding-top: 100px;
   background-color: ${colors.bgColor};
 `;
 const Title = styled.Text`
+  width: 100%;
   color: ${colors.textColor};
   font-size: 38px;
-  margin-bottom: 100px;
 `;
 
 const Btn = styled.TouchableOpacity`
@@ -75,7 +78,12 @@ const Home = ({ navigation: { navigate } }) => {
   return (
     <View>
       <Title>My Journal</Title>
+      <AdMobBanner
+        bannerSize="largeBanner"
+        adUnitID="ca-app-pub-3940256099942544/2934735716" // Test ID, Replace with your-admob-unit-id
+      />
       <FlatList
+        style={{ width: "100%", marginVertical: 100 }}
         data={feelings}
         contentContainerStyle={{ paddingVertical: 10 }}
         keyExtractor={(feeling) => feeling._id + ""}

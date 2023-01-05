@@ -6,6 +6,7 @@ import { ActivityIndicator } from "react-native";
 import styled from "styled-components";
 import colors from "./colors";
 import { DBContext } from "./context";
+import { setTestDeviceIDAsync } from "expo-ads-admob";
 
 const FeelingSchema = {
   name: "Feeling",
@@ -34,6 +35,7 @@ export default function App() {
     });
     setRealm(connection);
     setLoading(false);
+    await setTestDeviceIDAsync("EMULATOR");
   };
   useEffect(() => {
     realmLoading();
