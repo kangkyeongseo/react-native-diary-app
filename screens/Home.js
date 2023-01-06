@@ -36,6 +36,7 @@ const Btn = styled.TouchableOpacity`
 const Record = styled.View`
   background-color: ${colors.cardColor};
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
   border-radius: 10px;
@@ -49,6 +50,10 @@ const Emotion = styled.Text`
 const Message = styled.Text`
   font-size: 18px;
   font-weight: 400;
+`;
+
+const Column = styled.View`
+  flex-direction: row;
 `;
 
 const Seperator = styled.View`
@@ -69,11 +74,14 @@ const Home = ({ navigation: { navigate } }) => {
       data.removeAllListeners();
     };
   }, []);
-  const onPress = (id) => {
+  const onDelete = (id) => {
     realm.write(() => {
       const feeling = realm.objectForPrimaryKey("Feeling", id);
       realm.delete(feeling);
     });
+  };
+  const onEdit = (id) => {
+    navigate("Write", { id: id });
   };
   return (
     <View>
@@ -89,12 +97,23 @@ const Home = ({ navigation: { navigate } }) => {
         keyExtractor={(feeling) => feeling._id + ""}
         ItemSeparatorComponent={Seperator}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => onPress(item._id)}>
-            <Record>
+          <Record>
+            <Column>
               <Emotion>{item.emotion}</Emotion>
               <Message>{item.message}</Message>
-            </Record>
-          </TouchableOpacity>
+            </Column>
+            <Column>
+              <TouchableOpacity
+                onPress={() => onEdit(item._id)}
+                style={{ marginRight: 5 }}
+              >
+                <Ionicons name="pencil" size={18} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => onDelete(item._id)}>
+                <Ionicons name="trash" size={18} />
+              </TouchableOpacity>
+            </Column>
+          </Record>
         )}
       />
       <Btn onPress={() => navigate("Write")}>

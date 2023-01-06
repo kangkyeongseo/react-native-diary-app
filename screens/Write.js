@@ -61,13 +61,27 @@ const EmotionText = styled.Text`
 
 const emtions = ["😄", "🥲", "😡", "🤔", "🥰"];
 
-const Write = ({ navigation: { goBack } }) => {
+const Write = ({ navigation: { goBack }, route }) => {
   const realm = useDB();
   const [selectedEmotion, setEmotion] = useState(null);
   const [feelings, setFeelings] = useState("");
+  const [edit, setEdit] = useState(false);
   const onChangeText = (text) => setFeelings(text);
   const onEmtionPress = (face) => setEmotion(face);
   const onSubmit = async () => {
+    if (feelings === "" || selectedEmotion === null) {
+      return Alert.alert("Please complete form");
+    }
+    realm.write(() => {
+      const feeling = realm.create("Feeling", {
+        _id: Date.now(),
+        emotion: selectedEmotion,
+        message: feelings,
+      });
+      goBack();
+    });
+  };
+  const onEdit = async () => {
     if (feelings === "" || selectedEmotion === null) {
       return Alert.alert("Please complete form");
     }
@@ -78,16 +92,24 @@ const Write = ({ navigation: { goBack } }) => {
     AdMobRewarded.addEventListener("rewardedVideoUserDidEarnReward", () => {
       AdMobRewarded.addEventListener("rewardedVideoDidDismiss", () => {
         realm.write(() => {
-          const feeling = realm.create("Feeling", {
-            _id: Date.now(),
-            emotion: selectedEmotion,
-            message: feelings,
-          });
+          const feeling = realm.objectForPrimaryKey("Feeling", route.params.id);
+          feeling.emotion = selectedEmotion;
+          feeling.message = feelings;
         });
       });
       goBack();
     });
   };
+  useEffect(() => {
+    if (route.params) {
+      realm.write(() => {
+        const feeling = realm.objectForPrimaryKey("Feeling", route.params.id);
+        setEmotion(feeling.emotion);
+        setFeelings(feeling.message);
+      });
+      setEdit(true);
+    } else return;
+  }, []);
   return (
     <View>
       <Title>How do you feel today?</Title>
@@ -104,12 +126,12 @@ const Write = ({ navigation: { goBack } }) => {
       </Emotions>
       <TextInput
         returnKeyLabel="done"
-        onSubmitEditing={onSubmit}
+        onSubmitEditing={edit ? onEdit : onSubmit}
         onChangeText={onChangeText}
         value={feelings}
         placeholder="Write your feelings..."
       />
-      <Btn onPress={onSubmit}>
+      <Btn onPress={edit ? onEdit : onSubmit}>
         <BtnText>Save</BtnText>
       </Btn>
     </View>
